@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Timers;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -144,6 +145,7 @@ namespace KinectPhotoHack
         private SkeletonDisplayManager skeletonDisplayManager;
 
         private VoiceCommander voiceCommander;
+        private List<ImageSource> images;
 
         public MainWindow()
         {
@@ -189,6 +191,7 @@ namespace KinectPhotoHack
         {
             Dispatcher.BeginInvokeOn(delegate
                                      {
+                                         Debug.WriteLine(obj);
                                          switch (obj) {
                                              case "kittens":
                                                  //do search for kittens
@@ -219,6 +222,8 @@ namespace KinectPhotoHack
 
         private void doSearch(string obj)
         {
+            images = new List<ImageSource>();
+
             promptLabel.Visibility = Visibility.Hidden;
             var cli = new Client();
             list = null;
@@ -241,28 +246,44 @@ namespace KinectPhotoHack
                     Debug.WriteLine(response.ToString());
 
                     if (list.Collection.Count() > 0) {
-                        mediaItem = list.Collection[0];
-                        reloadImage();
+                        int i = 0;
+                        foreach (var v in list.Collection) {
+                            var bw = new BackgroundWorker();
+                            string url = v.url;
+                            bw.DoWork += (s, e) =>
+                                         {
+                                             Debug.WriteLine("working on " + url);
+                                             Dispatcher.BeginInvokeOn(delegate
+                                                                      {
+                                                                          var img = new BitmapImage(new Uri(url, UriKind.Absolute));
+                                                                          images.Add(img);
+                                                                      });
+                                         };
+                            bw.RunWorkerAsync();
+
+                            if (i == 0) {
+                                bw.RunWorkerCompleted += (s, e) => { Dispatcher.BeginInvokeOn(delegate { fullImage.Source = images.First(); }); };
+                            }
+
+                            i++;
+                        }
                     }
-                }
-                );
+                });
         }
 
         private void previousItem()
         {
-            int currentIndex = list.Collection.IndexOf(mediaItem);
+            int currentIndex = images.IndexOf(fullImage.Source);
             if (currentIndex > 0) {
-                mediaItem = list.Collection[currentIndex - 1];
-                reloadImage();
+                fullImage.Source = images[currentIndex - 1];
             }
         }
 
         private void nextItem()
         {
-            int currentIndex = list.Collection.IndexOf(mediaItem);
+            int currentIndex = images.IndexOf(fullImage.Source);
             if (currentIndex + 1 < list.Collection.Count()) {
-                mediaItem = list.Collection[currentIndex + 1];
-                reloadImage();
+                fullImage.Source = images[currentIndex + 1];
             }
         }
 
@@ -420,6 +441,16 @@ namespace KinectPhotoHack
             var form1 = new Form1();
             form1.Show();
         }
+
+        private void ImageContainer_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (images != null && images.Count > 0) {
+                nextItem();
+            } else {
+                doSearch("kittens");
+            }
+        }
+
     }
 
     public class UserAuth

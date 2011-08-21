@@ -1,6 +1,5 @@
 ﻿<Window x:Class="KinectPhotoHack.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="MainWindow" Height="818" Width="962"
-        Loaded="Window_Loaded" Name="mainWindow">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="MainWindow" Loaded="Window_Loaded" Name="mainWindow" WindowStartupLocation="CenterScreen" WindowState="Maximized">
 
   <Grid Height="752" Width="856" Name="LayoutRoot">
     <Grid.RowDefinitions>
@@ -9,13 +8,14 @@
       <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
+      <ColumnDefinition />
+    </Grid.ColumnDefinitions>
 
-    <Grid Margin="5,5,5,5" Grid.Row="0" Name="ImageContainer" Height="500">
-      <Image Source="{Binding url}" />
-            <Label Name="promptLabel" Content="Say: Kittens, Puppies, Login" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="28" />
-        </Grid>
+        <Grid Margin="5,5,5,5" Grid.Row="0" Name="ImageContainer"  MouseUp="ImageContainer_MouseUp" Height="500">
+      <Image Name="fullImage" />
+      <Label Name="promptLabel" Content="Say: Kittens, Puppies, Login" HorizontalAlignment="Center"
+             VerticalAlignment="Center" FontSize="28" />
+    </Grid>
 
     <Viewbox Margin="5" Grid.Row="1" Grid.Column="0" MouseUp="Viewbox_MouseUp">
       <Grid Width="640" Height="480" ClipToBounds="True">
@@ -23,11 +23,12 @@
         <Canvas x:Name="kinectCanvas"></Canvas>
         <Canvas x:Name="gesturesCanvas"></Canvas>
         <Rectangle Stroke="Black" StrokeThickness="1" />
-                <Label Name="capturedLabel" Visibility="Hidden" Content="Captured" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="26" Foreground="White" FontWeight="Bold" />
-            </Grid>
+        <Label Name="capturedLabel" Visibility="Hidden" Content="Captured" HorizontalAlignment="Center"
+               VerticalAlignment="Center" FontSize="26" Foreground="White" FontWeight="Bold" />
+      </Grid>
     </Viewbox>
-    <Button Content="Login" Height="23" HorizontalAlignment="Center" Name="button1" VerticalAlignment="Top"
-            Width="75" Click="button1_Click" Grid.Row="2" />
+    <Button Content="Login" Height="23" HorizontalAlignment="Center" Name="button1" VerticalAlignment="Top" Width="75"
+            Click="button1_Click" Grid.Row="2" />
 
   </Grid>
 </Window>
