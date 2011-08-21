@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -54,13 +55,6 @@ namespace PhotobucketAPI
         }
 
         #endregion
-
-        /// <summary>
-        /// Start API constants.  Fill in with your Photobucket Key/Secret
-        /// </summary>
-        protected const string API_CONSUMER_KEY = "";
-
-        protected const string API_CONSUMER_SECRET = "";
 
         ///////////////////////////////////////////////////////////////////////
 
@@ -286,7 +280,7 @@ namespace PhotobucketAPI
             args.Add("oauth_nonce", Utilities.makeNonce());
             args.Add("oauth_timestamp", Utilities.makeTimestamp().ToString());
             args.Add("oauth_signature_method", "HMAC-SHA1");
-            args.Add("oauth_consumer_key", API_CONSUMER_KEY);
+            args.Add("oauth_consumer_key", ConfigurationManager.AppSettings["oauth_key"]);
             if (!String.IsNullOrEmpty(oauth_token))
             {
                 args.Add("oauth_token", oauth_token);
@@ -309,7 +303,7 @@ namespace PhotobucketAPI
 
             //make signature keystring
             string sigKey = String.Format("{0}&{1}",
-                                          Utilities.UrlEncode3986(API_CONSUMER_SECRET),
+                                          Utilities.UrlEncode3986(ConfigurationManager.AppSettings["oauth_secret"]),
                                           String.IsNullOrEmpty(oauth_secret)
                                               ? ""
                                               : Utilities.UrlEncode3986(oauth_secret));
